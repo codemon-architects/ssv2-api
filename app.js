@@ -1,16 +1,26 @@
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
 var logger = require("morgan");
 var passport = require("passport");
 var app = express();
+const cors = require("cors");
 var session = require("express-session");
+const assignmentRouter = require("./routers/assignment");
 var casLogin = require("./middleware/casLogin");
+
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser("super secret"));
-
+var corsOptions = {
+  origin: "*",
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.use(cors(corsOptions));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(
@@ -20,10 +30,6 @@ app.use(
     saveUninitialized: true,
   })
 );
-
-app.get("/test", function (req, res) {
-  res.send("Welcome to Passport with CAS!!! You are logged in.");
-});
 
 //var serverBaseURL = app.get('http') + app.get('host') + ':' + app.get('port')+'/';
 //const serverBaseURL = 'https://shib.idm.umd.edu/shibboleth-idp/profile/cas/';
@@ -49,5 +55,6 @@ const cas = new (require("passport-cas").Strategy)(
 passport.use(cas);
 
 app.use("/cas_login", casLogin({ app: app }));
+app.use("/proj", assignmentRouter);
 
 module.exports = app;
