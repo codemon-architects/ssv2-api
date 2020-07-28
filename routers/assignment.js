@@ -24,8 +24,12 @@ assignment.post("/submission", multer().single("file"), function (
     return;
   }
   let file = req.file;
+  console.log(req.file);
   // Redundant server-side check if file type is correct format
-  if (file.mimetype !== "application/zip") {
+  if (
+    file.mimetype !== "application/zip" &&
+    file.mimetype !== "application/x-zip-compressed"
+  ) {
     res.status(415).send("File is not of type .zip");
   }
   // Now we can start the stream
