@@ -7,7 +7,7 @@ var passport = require("passport");
 var app = express();
 const cors = require("cors");
 var session = require("express-session");
-const assignmentRouter = require("./routers/assignment");
+const termRouter = require("./routers/term");
 var casLogin = require("./middleware/casLogin");
 
 app.use(logger("dev"));
@@ -55,6 +55,17 @@ const cas = new (require("passport-cas").Strategy)(
 passport.use(cas);
 
 app.use("/cas_login", casLogin({ app: app }));
-app.use("/proj", assignmentRouter);
+app.use(
+  "/:term",
+  function (req, res, next) {
+    // Check to make sure student id exists on request
+    if (req.query.dirid) {
+      next();
+    } else {
+      res.status(400).send("Missing student id");
+    }
+  },
+  termRouter
+);
 
 module.exports = app;
