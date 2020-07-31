@@ -10,6 +10,8 @@ var session = require("express-session");
 const termRouter = require("./routers/term");
 var casLogin = require("./middleware/casLogin");
 
+const students = require("./spoofData");
+
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -60,8 +62,13 @@ app.use(
   function (req, res, next) {
     // Check to make sure student id exists on request
     if (req.query.dirid) {
-      next();
+      if (students.find((x) => x.dirid === req.query.dirid)) {
+        next();
+      } else {
+        res.status(400).send("Student doesn't exist");
+      }
     } else {
+      console.log("missing student id");
       res.status(400).send("Missing student id");
     }
   },
