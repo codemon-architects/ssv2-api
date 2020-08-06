@@ -1,7 +1,10 @@
 var express = require("express");
 var term = express.Router({ mergeParams: true });
 const projectsRouter = require("./projects");
-
+const db = require("../database");
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
+const Course = require("../models/Course");
 const students = require("../spoofData");
 
 let termPattern = /^(summer|spring|winter|fall)([0-9]{4})$/i;
@@ -49,6 +52,46 @@ term.get("/courses", function (req, res, next) {
   }
 });
 
-term.use("/:courseid/project", projectsRouter);
+term.post("/course", function (req, res) {
+  //Testing
+  Course.create({
+    instructor: "Nelson Padua Perez",
+    title: "CMSC216",
+    description: "Introduction to Computer Systems",
+    term: "summer2020",
+  });
+  res.send("Course created");
+});
+
+term.get("/course", function (req, res) {
+  //Testing
+  const { id } = req.query;
+
+  Course.findOne({ where: { id: id } })
+    .then((course) =>
+      course != null
+        ? res.send(course)
+        : res.send("Couldn't find any matching course")
+    )
+    .catch((err) => console.log(err));
+});
+
+term.use(
+  "/:courseid/project",
+  function (req, res, next) {
+    // Check to make sure student id exists on request
+    if (req.query.dirid) {
+      if (students.find((x) => x.dirid === req.query.dirid)) {
+        next();
+      } else {
+        res.status(400).send("Student doesn't exist");
+      }
+    } else {
+      console.log("missing student id");
+      res.status(400).send("Missing student id");
+    }
+  },
+  projectsRouter
+);
 
 module.exports = term;

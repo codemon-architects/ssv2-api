@@ -4,6 +4,8 @@ const path = require("path");
 const multer = require("multer");
 const streamifier = require("streamifier");
 const fs = require("fs");
+const db = require("../database");
+const Course = require("../models/Course");
 
 const students = require("../spoofData");
 
@@ -43,12 +45,22 @@ project.get("/", function (req, res, next) {
   }
 });
 
+project.get("/test", function (req, res) {
+  Course.findAll()
+    .then((courses) => {
+      console.log(courses);
+      res.status(200).send("Courses");
+    })
+    .catch((err) => console.log(err));
+});
+
 //UPLOAD new submission from specific student
 project.post("/:projid/submission", multer().single("file"), function (
   req,
   res,
   next
 ) {
+  //ERROR CHECKING
   // Check if file was uploaded
   if (!req.file) {
     console.log("no file");
@@ -61,10 +73,12 @@ project.post("/:projid/submission", multer().single("file"), function (
     res.status(400).send("Missing submission number");
     return;
   }
+
   // Setup necessary variables
   let { term, courseid, projid } = req.params;
   let { dirid, subid } = req.query;
   let file = req.file;
+
   // Redundant server-side check if file type is correct format
   if (
     file.mimetype !== "application/zip" &&
@@ -102,7 +116,6 @@ project.post("/:projid/submission", multer().single("file"), function (
       }
     );
 
-    //TODO: Who determines the submission number?
     function writeFile() {
       const read = streamifier.createReadStream(file.buffer);
       const write = fs.createWriteStream(

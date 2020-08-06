@@ -1,8 +1,6 @@
 const time =
   new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString();
 
-//TODO: Get actual time signature of upload
-
 const CMSC131 = {
   id: "CMSC131",
   instructor: "Anwar Mamat",
@@ -23,6 +21,8 @@ const CMSC132 = {
         {
           dirid: "tbeal",
           ts: time,
+          number: 1,
+          file: null,
         },
       ],
     },
@@ -48,18 +48,26 @@ const CMSC216 = {
         {
           dirid: "kbeal",
           ts: time,
+          number: 1,
+          file: null,
         },
         {
           dirid: "tbeal",
           ts: time,
+          number: 1,
+          file: null,
         },
         {
           dirid: "tbeal",
           ts: time,
+          number: 2,
+          file: null,
         },
         {
           dirid: "tbeal",
           ts: time,
+          number: 3,
+          file: null,
         },
       ],
     },

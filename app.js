@@ -1,5 +1,6 @@
 var express = require("express");
 var path = require("path");
+require("dotenv").config();
 var cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 var logger = require("morgan");
@@ -9,6 +10,11 @@ const cors = require("cors");
 var session = require("express-session");
 const termRouter = require("./routers/term");
 var casLogin = require("./middleware/casLogin");
+
+const db = require("./database");
+db.authenticate()
+  .then(() => console.log("Database connected..."))
+  .catch((err) => console.log("ERROR: " + err));
 
 const students = require("./spoofData");
 
@@ -59,19 +65,7 @@ passport.use(cas);
 app.use("/cas_login", casLogin({ app: app }));
 app.use(
   "/:term",
-  function (req, res, next) {
-    // Check to make sure student id exists on request
-    if (req.query.dirid) {
-      if (students.find((x) => x.dirid === req.query.dirid)) {
-        next();
-      } else {
-        res.status(400).send("Student doesn't exist");
-      }
-    } else {
-      console.log("missing student id");
-      res.status(400).send("Missing student id");
-    }
-  },
+
   termRouter
 );
 
