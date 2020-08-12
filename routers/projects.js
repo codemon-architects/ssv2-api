@@ -5,18 +5,24 @@ const multer = require("multer");
 const streamifier = require("streamifier");
 const fs = require("fs");
 const db = require("../database");
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 const Course = require("../models/Course");
 
 const students = require("../spoofData");
 
 let termPattern = /^(summer|spring|winter|fall)([0-9]{4})$/i;
 
-// Returns list of all project names for specified course
+// Returns list of all projects for specified course
 project.get("/", function (req, res, next) {
-  dirid = req.query.dirid;
+  let { dirid } = req.query;
+  let { courseId } = req.params;
+
+  //TODO: Select all projects where courseID = courseID ???
+
   // Find all courses for student with dirid
   let student = students.find((x) => x.dirid == dirid);
-  let courseid = req.params.courseid;
+  let courseId = req.params.courseId;
   // Search for matching student
   if (student) {
     let projects = [];
@@ -27,7 +33,7 @@ project.get("/", function (req, res, next) {
       courses = student.courses[year][sem];
       // Get project info from specific course
       if (courses.length > 0) {
-        let course = courses.find((course) => course.id == courseid); // Get specific course
+        let course = courses.find((course) => course.id == courseId); // Get specific course
         let projectsDistilled = course.projects.map((proj) => {
           let subs = proj.submissions.filter((sub) => sub.dirid == dirid);
           return {
@@ -75,7 +81,7 @@ project.post("/:projid/submission", multer().single("file"), function (
   }
 
   // Setup necessary variables
-  let { term, courseid, projid } = req.params;
+  let { term, courseId, projid } = req.params;
   let { dirid, subid } = req.query;
   let file = req.file;
 
@@ -90,13 +96,13 @@ project.post("/:projid/submission", multer().single("file"), function (
       "Checking for directory" +
         path.join(
           __dirname,
-          `/../../data/${term}/${courseid}/${projid}/${dirid}`
+          `/../../data/${term}/${courseId}/${projid}/${dirid}`
         )
     );
     fs.exists(
       path.join(
         __dirname,
-        `/../../data/${term}/${courseid}/${projid}/${dirid}`
+        `/../../data/${term}/${courseId}/${projid}/${dirid}`
       ),
       (exists) => {
         if (exists) {
@@ -107,7 +113,7 @@ project.post("/:projid/submission", multer().single("file"), function (
           fs.mkdirSync(
             path.join(
               __dirname,
-              `/../../data/${term}/${courseid}/${projid}/${dirid}`
+              `/../../data/${term}/${courseId}/${projid}/${dirid}`
             ),
             { recursive: true }
           );
@@ -123,7 +129,7 @@ project.post("/:projid/submission", multer().single("file"), function (
           __dirname,
           "..",
           "..",
-          `data/${term}/${courseid}/${projid}/${dirid}/${dirid}-submission-${subid}.zip`
+          `data/${term}/${courseId}/${projid}/${dirid}/${dirid}-submission-${subid}.zip`
         )
       );
 
@@ -149,7 +155,7 @@ project.post("/:projid/submission", multer().single("file"), function (
           let semester = match[1],
             year = match[2];
           let projects = student.courses[year][semester].find(
-            (x) => x.id == courseid
+            (x) => x.id == courseId
           ).projects;
           let submissions = projects.find((x) => x.projid == projid)
             .submissions;
@@ -167,19 +173,19 @@ project.post("/:projid/submission", multer().single("file"), function (
 //DOWNLOAD a particular submission from a student
 project.get("/:projid/submission/:subid", function (req, res, next) {
   // Setup all necessary variables
-  let { term, courseid, projid, subid } = req.params;
+  let { term, courseId, projid, subid } = req.params;
   let { dirid } = req.query;
 
   console.log(
     "Checking for submission at directory" +
-      path.join(__dirname, `/../../data/${term}/${courseid}/${projid}/${dirid}`)
+      path.join(__dirname, `/../../data/${term}/${courseId}/${projid}/${dirid}`)
   );
   fs.exists(
     path.join(
       __dirname,
       "..",
       "..",
-      `data/${term}/${courseid}/${projid}/${dirid}/${dirid}-submission-${subid}.zip`
+      `data/${term}/${courseId}/${projid}/${dirid}/${dirid}-submission-${subid}.zip`
     ),
     (exists) => {
       if (exists) {
@@ -190,7 +196,7 @@ project.get("/:projid/submission/:subid", function (req, res, next) {
             __dirname,
             "..",
             "..",
-            `data/${term}/${courseid}/${projid}/${dirid}/${dirid}-submission-${subid}.zip`
+            `data/${term}/${courseId}/${projid}/${dirid}/${dirid}-submission-${subid}.zip`
           ),
           `submission-${subid}.zip`,
           (err) => {

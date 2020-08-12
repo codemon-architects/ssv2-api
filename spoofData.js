@@ -75,18 +75,10 @@ const CMSC216 = {
 };
 
 const courses = {
-  2020: {
-    winter: [],
-    spring: [CMSC132, CMSC216],
-    summer: [CMSC131, CMSC132, CMSC216],
-    fall: [CMSC131, CMSC216],
-  },
-  2019: {
-    winter: [],
-    spring: [],
-    summer: [],
-    fall: [],
-  },
+  winter2020: [],
+  spring2020: [CMSC132, CMSC216],
+  summer2020: [CMSC131, CMSC132, CMSC216],
+  fall2020: [CMSC131, CMSC216],
 };
 
 const students = [

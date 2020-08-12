@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const db = require("../database");
+const Project = require("./Project");
 
 const Course = db.define("course", {
   instructor: { type: Sequelize.STRING },
@@ -7,5 +8,7 @@ const Course = db.define("course", {
   description: { type: Sequelize.STRING },
   term: { type: Sequelize.STRING },
 });
+
+Course.hasMany(Project, { as: "projects" });
 
 module.exports = Course;
