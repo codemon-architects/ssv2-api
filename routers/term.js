@@ -9,8 +9,9 @@ const students = require("../spoofData");
 
 let termPattern = /^(summer|spring|winter|fall)([0-9]{4})$/i;
 
+// Return all courses for a particular term
 term.get("/courses", function (req, res, next) {
-  Course.findAll()
+  Course.findAll({ where: { term: req.params.term } })
     .then((courses) => res.status(200).json(courses))
     .catch((err) => res.status(400).send(err));
 
