@@ -4,7 +4,6 @@ const Course = require("./Course");
 const Submission = require("./Submission");
 
 const Project = db.define("project", {
-  // submissions: { type: Sequelize.ARRAY() },
   dueDate: { type: Sequelize.DATE },
   title: { type: Sequelize.STRING },
 });

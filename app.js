@@ -41,7 +41,7 @@ app.use(
 
 //var serverBaseURL = app.get('http') + app.get('host') + ':' + app.get('port')+'/';
 //const serverBaseURL = 'https://shib.idm.umd.edu/shibboleth-idp/profile/cas/';
-const serverBaseURL = "http://localhost:3000/";
+const serverBaseURL = "http://localhost:5000/";
 
 // Configure CAS Authentication Strategy for Passport
 const cas = new (require("passport-cas").Strategy)(
